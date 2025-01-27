@@ -6,30 +6,31 @@ import { auth } from '../utils/firebase.js';
 
 import { useDispatch } from 'react-redux';
 import { addUser } from '../utils/userSlice.js';
+import { BACKGROUND_URL } from '../utils/constants.js'
 
 const Login = () => {
     const dispatch = useDispatch();
-    const [isSignInForm, setIsSignInForm]=useState(true);
-    const [errorMessage, setErrorMessage]=useState(null);
+    const [isSignInForm, setIsSignInForm] = useState(true);
+    const [errorMessage, setErrorMessage] = useState(null);
 
     const name = useRef(null);
     const email = useRef(null);
     const password = useRef(null);
 
-    const handleSubmit=(e)=>{
+    const handleSubmit = (e) => {
         e.preventDefault();
         const message = validateForm(email.current.value, password.current.value);
         setErrorMessage(message);
-        if(message) return;
+        if (message) return;
         // signUp
-        if(!isSignInForm){
+        if (!isSignInForm) {
             createUserWithEmailAndPassword(auth, email.current.value, password.current.value)
                 .then((userCredential) => {
                     const user = userCredential.user;
                     updateProfile(user, {
                         displayName: name.current.value, photoURL: "https://example.com/jane-q-user/profile.jpg"
                     }).then(() => {
-                        const {uid, email, displayName} = auth.currentUser;
+                        const { uid, email, displayName } = auth.currentUser;
                         dispatch(addUser({ uid: uid, email: email, displayName: displayName }))
 
                     }).catch((error) => {
@@ -39,13 +40,12 @@ const Login = () => {
                 .catch((error) => {
                     const errorCode = error.code;
                     const errorMessage = error.message;
-                    setErrorMessage(errorCode+"-"+errorMessage);
+                    setErrorMessage(errorCode + "-" + errorMessage);
                 });
-        }else{
+        } else {
             signInWithEmailAndPassword(auth, email.current.value, password.current.value)
                 .then((userCredential) => {
                     const user = userCredential.user;
-                    console.log(user);
                 })
                 .catch((error) => {
                     const errorCode = error.code;
@@ -55,16 +55,16 @@ const Login = () => {
         }
     }
 
-    const handleButtonClick = () =>{
+    const handleButtonClick = () => {
         setIsSignInForm(!isSignInForm);
     }
     return (
         <div>
             <Header />
             <div className='absolute'>
-                <img src="https://assets.nflxext.com/ffe/siteui/vlv3/2f5a878d-bbce-451b-836a-398227a34fbf/web/IN-en-20241230-TRIFECTA-perspective_5ab944a5-1a71-4f6d-b341-8699d0491edd_small.jpg" alt="background-img" />
+                <img src={BACKGROUND_URL} alt="background-img" />
             </div>
-            <form onSubmit={handleSubmit}  className='w-3/12 absolute p-12 bg-black my-36 mx-auto right-0 left-0 text-white rounded-lg bg-opacity-80'>
+            <form onSubmit={handleSubmit} className='w-3/12 absolute p-12 bg-black my-36 mx-auto right-0 left-0 text-white rounded-lg bg-opacity-80'>
                 <h1 className='font-bold text-3xl py-4'>
                     {isSignInForm ? "Sign In" : "Sign Up"}
                 </h1>
